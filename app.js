@@ -310,15 +310,15 @@ function moonView() {
 function blessingView() {
   const current = BLESSING_ROUNDS[state.blessing.round % BLESSING_ROUNDS.length];
   const titles = [tr("step1"), tr("step2"), tr("step3")];
-  const body = `<div class="board-body"><div class="blessing-steps">
+  const body = `<div class="board-actions board-actions-top">
+      <div class="score-control"><button type="button" data-action="score-down" aria-label="-1">−</button><strong>${state.blessing.score}</strong><button type="button" data-action="score-up" aria-label="+1">+</button></div>
+      <button class="primary-button" type="button" data-action="blessing-next">${state.blessing.step < 2 ? tr("nextStep") : tr("nextRound")}<svg viewBox="0 0 20 20"><path d="M4 10h11M11 6l4 4-4 4"/></svg></button>
+    </div>
+    <div class="board-body"><div class="blessing-steps">
     ${current.map((prompt, i) => `<article class="blessing-step ${i === state.blessing.step ? "active" : ""} ${i < state.blessing.step ? "done" : ""}">
       <span class="step-no">0${i + 1}</span><h3>${titles[i]}</h3><p>${local(prompt)}</p>
     </article>`).join("")}
-    </div></div>
-    <div class="board-actions">
-      <div class="score-control"><button type="button" data-action="score-down" aria-label="-1">−</button><strong>${state.blessing.score}</strong><button type="button" data-action="score-up" aria-label="+1">+</button></div>
-      <button class="primary-button" type="button" data-action="blessing-next">${state.blessing.step < 2 ? tr("nextStep") : tr("nextRound")}<svg viewBox="0 0 20 20"><path d="M4 10h11M11 6l4 4-4 4"/></svg></button>
-    </div>`;
+    </div></div>`;
   return shell(body, `${String(state.blessing.round + 1).padStart(2,"0")}`, tr("roundLabel"));
 }
 
@@ -331,8 +331,8 @@ function quizView() {
   }).join("");
   const feedback = answered ? `<strong>${state.quiz.selected === q.a ? tr("correct") : tr("notQuite")}</strong>&nbsp; ${local(q.note)}` : tr("chooseAnswer");
   const isLast = state.quiz.index === QUIZ.length - 1;
-  const body = `<div class="board-body"><div class="quiz-wrap"><p class="quiz-question">${local(q.q)}</p><div class="quiz-options">${options}</div><div class="quiz-feedback">${feedback}</div></div></div>
-    <div class="board-actions">${answered ? `<button class="primary-button" type="button" data-action="quiz-next">${isLast ? tr("restartQuiz") : tr("nextQuestion")}<svg viewBox="0 0 20 20"><path d="M4 10h11M11 6l4 4-4 4"/></svg></button>` : ""}</div>`;
+  const body = `<div class="board-actions board-actions-top">${answered ? `<button class="primary-button" type="button" data-action="quiz-next">${isLast ? tr("restartQuiz") : tr("nextQuestion")}<svg viewBox="0 0 20 20"><path d="M4 10h11M11 6l4 4-4 4"/></svg></button>` : `<span class="action-placeholder" aria-hidden="true"></span>`}</div>
+    <div class="board-body"><div class="quiz-wrap"><p class="quiz-question">${local(q.q)}</p><div class="quiz-options">${options}</div><div class="quiz-feedback">${feedback}</div></div></div>`;
   return shell(body, `${state.quiz.score}/${QUIZ.length}`, tr("score"));
 }
 
@@ -360,12 +360,13 @@ function calculateWinners(marked) {
 
 function bingoView() {
   if (!state.bingo.prompts.length) dealBingo();
-  const body = `<div class="board-body"><div class="bingo-grid">${state.bingo.prompts.map((prompt, i) => `
+  const body = `<div class="board-actions board-actions-top"><button class="secondary-button" type="button" data-action="new-board"><svg viewBox="0 0 20 20"><path d="M15 7V3m0 0h-4M15 3l-3 3a6 6 0 1 0 1.3 6.5"/></svg>${tr("newBoard")}</button></div>
+    <div class="board-body"><div class="bingo-grid">${state.bingo.prompts.map((prompt, i) => `
     <div class="bingo-cell ${state.bingo.marked.has(i) ? "marked" : ""} ${state.bingo.winners.has(i) ? "winner" : ""}">
       <button class="bingo-mark" type="button" data-cell="${i}" aria-pressed="${state.bingo.marked.has(i)}">${local(prompt)}</button>
       <input class="bingo-name" data-name="${i}" value="${escapeAttr(state.bingo.marked.get(i) || "")}" placeholder="${tr("namePlaceholder")}" aria-label="${tr("namePlaceholder")}" />
     </div>`).join("")}</div></div>
-    <div class="board-actions"><button class="secondary-button" type="button" data-action="new-board"><svg viewBox="0 0 20 20"><path d="M15 7V3m0 0h-4M15 3l-3 3a6 6 0 1 0 1.3 6.5"/></svg>${tr("newBoard")}</button></div>`;
+`;
   return shell(body, `${state.bingo.marked.size}/16`, tr("marked"));
 }
 

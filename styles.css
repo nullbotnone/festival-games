@@ -181,6 +181,9 @@ h1 { max-width: 11em; margin: 0; font: 500 clamp(3rem, 6.3vw, 6rem)/1 Georgia, "
 .prompt-text { margin: 0; color: var(--st-ink); font: 500 clamp(1.8rem, 4.2vw, 3.4rem)/1.4 Georgia, "Songti SC", "Noto Serif SC", serif; letter-spacing: -.025em; text-wrap: balance; }
 .prompt-hint { margin: 0; color: var(--st-soft); font-size: .9rem; }
 .board-actions-top { padding: .1rem clamp(1.4rem, 3vw, 2.4rem) .7rem; }
+/* holds the row open while the quiz waits for an answer, so revealing the
+   advance button does not shove the question down the board */
+.action-placeholder { display: block; min-height: 3rem; }
 .board-actions-top + .board-body { align-items: stretch; padding-top: 0; }
 .board-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .75rem; padding: 0 clamp(1.4rem, 3vw, 2.4rem) clamp(1.4rem, 3vw, 2.2rem); }
 .primary-button, .secondary-button { min-height: 3rem; display: inline-flex; align-items: center; justify-content: center; gap: .6rem; border-radius: .25rem; padding: .65rem 1.15rem; cursor: pointer; font-weight: 760; font-size: .87rem; transition: transform .18s, background .18s, border-color .18s; }
