@@ -187,8 +187,8 @@ h1 { max-width: 11em; margin: 0; font: 500 clamp(3rem, 6.3vw, 6rem)/1 Georgia, "
 .primary-button svg, .secondary-button svg { width: 1rem; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .secondary-button { border: 1px solid var(--st-line-strong); background: transparent; color: var(--st-mid); }
 .secondary-button:hover { color: var(--st-ink-bright); border-color: var(--st-line-strong); background: color-mix(in srgb, var(--gold) 8%, transparent); }
-.timer-wrap { min-width: 8.6rem; display: flex; align-items: center; justify-content: space-between; gap: .5rem; border: 1px solid var(--st-line-strong); border-radius: 999px; padding: .3rem .45rem .3rem .8rem; color: var(--st-mid); font: 700 .76rem/1 ui-monospace, monospace; }
-.timer-toggle { width: 2rem; height: 2rem; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--st-chip); color: var(--st-ink); cursor: pointer; }
+.timer-wrap { min-width: 10.5rem; min-height: 3rem; display: flex; align-items: center; justify-content: space-between; gap: .6rem; border: 1px solid var(--st-line-strong); border-radius: 999px; padding: .3rem .4rem .3rem 1rem; color: var(--st-ink); font: 700 1.15rem/1 ui-monospace, monospace; letter-spacing: .02em; }
+.timer-toggle { width: 2.3rem; height: 2.3rem; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--st-chip); color: var(--st-ink); cursor: pointer; font-size: .95rem; }
 
 .blessing-steps { width: min(100%, 62rem); display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; }
 .blessing-step { position: relative; min-height: 14rem; display: flex; flex-direction: column; padding: 1.5rem; border: 1px solid var(--st-line); border-radius: 1rem; background: var(--st-panel); transition: transform .2s, border-color .2s, background .2s; }
@@ -291,6 +291,7 @@ footer p { margin: 0; text-align: center; }
   .prompt-card { min-height: 17rem; padding: 1.6rem 1.25rem; }
   .prompt-text { font-size: 1.5rem; }
   .board-actions { padding: 0 1rem 1.25rem; }
+  .timer-wrap { min-width: 9rem; font-size: 1rem; }
   .blessing-steps { grid-template-columns: 1fr; }
   .blessing-step { min-height: 6.5rem; }
   .blessing-step h3 { margin: 1rem 0 .35rem; }
@@ -330,4 +331,8 @@ footer p { margin: 0; text-align: center; }
 :fullscreen .bingo-grid { width: min(100%, 78rem); }
 :fullscreen .bingo-cell { min-height: 9rem; font-size: clamp(1rem, 1.5vw, 1.4rem); }
 :fullscreen .board-description { font-size: 1.05rem; }
+:fullscreen .timer-wrap { min-width: 17rem; min-height: 4.6rem; padding-left: 1.7rem; font-size: clamp(1.9rem, 2.6vw, 2.7rem); }
+:fullscreen .timer-toggle { width: 3.5rem; height: 3.5rem; font-size: 1.4rem; }
+:fullscreen .primary-button, :fullscreen .secondary-button { min-height: 4rem; padding: .65rem 1.6rem; font-size: 1.1rem; }
+:fullscreen .primary-button svg, :fullscreen .secondary-button svg { width: 1.3rem; }
 :fullscreen .game-board::after { -webkit-mask-size: min(34rem, 34%); mask-size: min(34rem, 34%); }
