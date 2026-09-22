@@ -195,6 +195,8 @@ const storage = {
   set(key, value) { try { localStorage.setItem(key, value); } catch (_) { /* private browsing */ } }
 };
 const savedLang = storage.get("festival-games.lang");
+const clock = (seconds) => `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+
 const shuffle = (items) => [...items].sort(() => Math.random() - .5);
 
 const state = {
@@ -253,14 +255,14 @@ function shell(inner, statusValue, statusLabel) {
 function moonView() {
   const prompt = MOON_PROMPTS[state.moon.deck[state.moon.pos]];
   const typeLabel = tr(prompt.type);
-  const body = `<div class="board-body"><div class="prompt-card animate" key="${state.moon.deck[state.moon.pos]}">
-      <span class="prompt-type">${typeLabel}</span><p class="prompt-text">${local(prompt)}</p><p class="prompt-hint">${tr("moonHint")}</p>
-    </div></div>
-    <div class="board-actions">
-      <div class="timer-wrap"><span>${String(Math.floor(state.moon.time / 60)).padStart(2,"0")}:${String(state.moon.time % 60).padStart(2,"0")}</span><button class="timer-toggle" type="button" data-action="timer" aria-label="${state.moon.running ? tr("pauseTimer") : tr("startTimer")}">${state.moon.running ? "Ⅱ" : "▶"}</button></div>
+  const body = `<div class="board-actions board-actions-top">
+      <div class="timer-wrap"><span>${clock(state.moon.time)}</span><button class="timer-toggle" type="button" data-action="timer" aria-label="${state.moon.running ? tr("pauseTimer") : tr("startTimer")}">${state.moon.running ? "Ⅱ" : "▶"}</button></div>
       <button class="secondary-button" type="button" data-action="shared">✓ ${tr("passes")}</button>
       <button class="primary-button" type="button" data-action="draw"><span>${tr("draw")}</span><svg viewBox="0 0 20 20"><path d="M4 10h11M11 6l4 4-4 4"/></svg></button>
-    </div>`;
+    </div>
+    <div class="board-body"><div class="prompt-card animate" key="${state.moon.deck[state.moon.pos]}">
+      <span class="prompt-type">${typeLabel}</span><p class="prompt-text">${local(prompt)}</p><p class="prompt-hint">${tr("moonHint")}</p>
+    </div></div>`;
   return shell(body, state.moon.shared, state.lang === "zh" ? "已分享人数" : "PEOPLE SHARED");
 }
 
@@ -354,26 +356,34 @@ function stopTimer() {
   state.moon.running = false;
 }
 
+function paintTimer() {
+  const text = $(".timer-wrap > span");
+  if (text) text.textContent = clock(state.moon.time);
+  const toggle = $(".timer-toggle");
+  if (!toggle) return;
+  toggle.textContent = state.moon.running ? "Ⅱ" : "▶";
+  toggle.setAttribute("aria-label", state.moon.running ? tr("pauseTimer") : tr("startTimer"));
+}
+
 function toggleTimer() {
   if (state.moon.running) {
     stopTimer();
-    renderGame();
+    paintTimer();
     return;
   }
   if (state.moon.time === 0) state.moon.time = 60;
   state.moon.running = true;
-  renderGame();
+  paintTimer();
   timerId = setInterval(() => {
     state.moon.time -= 1;
     if (state.moon.time <= 0) {
       state.moon.time = 0;
       stopTimer();
-      renderGame();
+      paintTimer();
       toast(tr("timerDone"));
       return;
     }
-    const timerText = $(".timer-wrap > span");
-    if (timerText) timerText.textContent = `${String(Math.floor(state.moon.time / 60)).padStart(2,"0")}:${String(state.moon.time % 60).padStart(2,"0")}`;
+    paintTimer();
   }, 1000);
 }
 
@@ -419,7 +429,10 @@ function handleGameAction(target) {
   const action = target.closest("[data-action]")?.dataset.action;
   if (action === "draw") drawMoon();
   if (action === "timer") toggleTimer();
-  if (action === "shared") { state.moon.shared += 1; renderGame(); }
+  if (action === "shared") {
+    state.moon.shared += 1;
+    $(".board-status strong").textContent = state.moon.shared;
+  }
   if (action === "score-up") { state.blessing.score += 1; renderGame(); }
   if (action === "score-down") { state.blessing.score = Math.max(0, state.blessing.score - 1); renderGame(); }
   if (action === "blessing-next") {
