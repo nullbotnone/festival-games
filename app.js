@@ -102,7 +102,21 @@ const MOON_PROMPTS = [
   { type: "warmup", zh: "用三个词形容你理想中的团圆夜。", en: "Describe your ideal reunion evening in three words." },
   { type: "gratitude", zh: "此刻，你最想为哪一件事说“谢谢”？", en: "What is one thing you most want to say thank you for tonight?" },
   { type: "story", zh: "分享一次你在陌生地方被热情接待的经历。", en: "Share a time you were warmly welcomed in an unfamiliar place." },
-  { type: "faith", zh: "耶稣常在饭桌上与人相遇。若祂坐在这桌，你最想问什么？", en: "Jesus often met people around a table. If he sat here tonight, what would you ask?" }
+  { type: "faith", zh: "耶稣常在饭桌上与人相遇。若祂坐在这桌，你最想问什么？", en: "Jesus often met people around a table. If he sat here tonight, what would you ask?" },
+  { type: "warmup", zh: "今晚的月亮，你会给它配哪一首歌？", en: "What song would you play for tonight's moon?" },
+  { type: "warmup", zh: "如果能给月饼发明一种新口味，你会做什么馅？", en: "If you could invent a new mooncake filling, what would it be?" },
+  { type: "warmup", zh: "你更喜欢热闹的一大桌，还是安静的两三人？", en: "A big noisy table or a quiet one for three? Why?" },
+  { type: "warmup", zh: "如果中秋多放三天假，你最想拿来做什么？", en: "If the holiday gave you three extra days, how would you spend them?" },
+  { type: "story", zh: "你记得的第一个中秋，是在哪里过的？", en: "Where did you spend the first Mid-Autumn Festival you can remember?" },
+  { type: "story", zh: "家里有没有一道“只有某个人会做”的菜？", en: "Is there a dish only one person in your family knows how to make?" },
+  { type: "story", zh: "说一个和月亮有关的记忆——赶路、等人，或抬头的那一刻。", en: "Share a memory with the moon in it: a journey, a wait, or the moment you looked up." },
+  { type: "story", zh: "第一次离家过节，你是怎么度过的？", en: "How did you spend your first festival away from home?" },
+  { type: "gratitude", zh: "今年有谁的一通电话或一条消息，来得刚刚好？", en: "Whose call or message this year arrived at exactly the right moment?" },
+  { type: "gratitude", zh: "这一桌里，你想当面对谁说一句谢谢？", en: "Who at this table would you like to thank out loud, right now?" },
+  { type: "gratitude", zh: "有什么是你今年学会珍惜、去年却没怎么在意的？", en: "What did you learn to treasure this year that you overlooked last year?" },
+  { type: "faith", zh: "月亮自己不发光，只是反射太阳。这让你想到什么？", en: "The moon makes no light of its own; it only reflects the sun. What does that stir in you?" },
+  { type: "faith", zh: "有哪一件事，你还在等上帝的答案？", en: "What are you still waiting on God about?" },
+  { type: "faith", zh: "如果今晚的桌上留一个空位，你会为谁祷告？", en: "If one seat at tonight's table were left empty, who would you pray for?" }
 ];
 
 const BLESSING_ROUNDS = [
