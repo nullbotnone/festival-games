@@ -1,3 +1,29 @@
+/* Traditional is derived from the Simplified copy at runtime, so new prompts
+   only ever need one Chinese version. S2T_PAIRS covers every Simplified
+   character this app uses; S2T_WORDS handles the few whose Traditional form
+   depends on the word around them.
+   ponytail: characters outside the map pass through unchanged -- when new copy
+   introduces one, append its pair here (and check it is not context-dependent). */
+const S2T_PAIRS =
+  "与與东東两兩个個丰豐为為举舉么麼义義乐樂习習乡鄉书書争爭于於亏虧云雲亚亞从從们們众眾会會传傳体體儿兒关關养養写寫农農划劃刚剛创創别別务務动動励勵华華单單却卻历歷厨廚参參双雙发發变變号號后後吗嗎" +
+  "听聽启啟咸鹹团團围圍国國圆圓圣聖场場坚堅墙牆声聲处處备備头頭学學实實宠寵宾賓对對寻尋导導将將带帶帮幫并並庆慶应應开開张張归歸当當录錄忆憶惯慣愿願戏戲扬揚护護择擇换換据據数數无無时時显顯晓曉暂暫" +
+  "机機条條来來松鬆样樣横橫欢歡气氣没沒浏瀏温溫游遊满滿灭滅灯燈点點烛燭烧燒热熱爱愛献獻环環现現电電着著礼禮祷禱离離种種称稱稣穌竖豎竞競笔筆笼籠简簡红紅约約线線组組绍紹经經结結给給统統绳繩联聯聪聰" +
+  "胜勝脑腦脚腳腊臘节節苍蒼荣榮蜡蠟见見览覽计計认認讨討让讓训訓记記讲講许許论論设設识識词詞诗詩诚誠话話该該语語说說请請诸諸读讀课課谁誰谜謎谢謝负負责責贵貴资資赏賞赛賽赶趕车車轮輪轻輕载載辩辯边邊" +
+  "达達过過还還这這进進连連适適选選里裡钟鐘铅鉛错錯门門闭閉问問间間闹鬧队隊阳陽随隨难難静靜页頁项項预預题題风風饭飯饺餃饼餅馅餡马馬验驗骑騎";
+
+/* 台 / 只 / 斗 are left alone: they are valid Traditional on their own, and a
+   blanket swap would turn 只有 into 隻有 or 斗底下 into 鬥底下. */
+const S2T_WORDS = { "灯台": "燈臺", "农历": "農曆", "一只": "一隻" };
+
+const S2T = new Map();
+for (let i = 0; i < S2T_PAIRS.length; i += 2) S2T.set(S2T_PAIRS[i], S2T_PAIRS[i + 1]);
+
+const toTW = (text) => {
+  let out = text;
+  for (const [word, tw] of Object.entries(S2T_WORDS)) out = out.split(word).join(tw);
+  return out.replace(/[\u4e00-\u9fff]/g, (ch) => S2T.get(ch) || ch);
+};
+
 const I18N = {
   zh: {
     collection: "节日游戏", ready: "随时开场", eyebrow: "给教会节日聚会的互动游戏",
@@ -16,7 +42,10 @@ const I18N = {
     chooseAnswer: "请选择答案", nextQuestion: "下一题", restartQuiz: "再玩一轮", correct: "答对了！", notQuite: "差一点。",
     score: "得分", question: "题", answer: "答案", newBoard: "换一张卡", bingo: "连线成功！请邀请其中一位朋友分享故事。", marked: "已找到",
     fullOn: "已进入投屏模式", fullOff: "已退出投屏模式", timerDone: "时间到，感谢你的分享！",
-    copied: "游戏已切换", ariaTheme: "切换明暗主题", hostNote: "主持提醒：掌握整体节奏，也给每一位分享者完整表达的时间。"
+    copied: "游戏已切换", ariaTheme: "切换明暗主题", hostNote: "主持提醒：掌握整体节奏，也给每一位分享者完整表达的时间。",
+    skip: "跳到游戏", htmlLang: "zh-CN", docTitle: "欢聚 · 节日互动游戏｜slashai.app",
+    sharedCount: "已分享人数", roundLabel: "接力回合", fullBlocked: "浏览器未允许全屏，请使用浏览器菜单。",
+    step1: "回望恩典", step2: "说出感谢", step3: "送上祝福"
   },
   en: {
     collection: "Festival games", ready: "Ready to play", eyebrow: "Interactive games for church festival gatherings",
@@ -35,9 +64,15 @@ const I18N = {
     chooseAnswer: "Choose an answer", nextQuestion: "Next question", restartQuiz: "Play again", correct: "That's right!", notQuite: "Not quite.",
     score: "Score", question: "Question", answer: "Answer", newBoard: "New card", bingo: "Line complete! Invite one person in the line to share their story.", marked: "Found",
     fullOn: "Presentation mode on", fullOff: "Presentation mode off", timerDone: "Time — thank you for sharing!",
-    copied: "Game changed", ariaTheme: "Toggle light and dark theme", hostNote: "Host note: keep the overall pace while giving each speaker time to finish."
+    copied: "Game changed", ariaTheme: "Toggle light and dark theme", hostNote: "Host note: keep the overall pace while giving each speaker time to finish.",
+    skip: "Skip to the game", htmlLang: "en", docTitle: "Gather · Festival Games | slashai.app",
+    sharedCount: "PEOPLE SHARED", roundLabel: "ROUND", fullBlocked: "Fullscreen was blocked; use your browser menu instead.",
+    step1: "Remember grace", step2: "Name gratitude", step3: "Offer blessing"
   }
 };
+
+I18N.tw = Object.fromEntries(Object.entries(I18N.zh).map(([key, value]) => [key, toTW(value)]));
+I18N.tw.htmlLang = "zh-TW";
 
 const GAMES = [
   {
@@ -195,12 +230,17 @@ const storage = {
   set(key, value) { try { localStorage.setItem(key, value); } catch (_) { /* private browsing */ } }
 };
 const savedLang = storage.get("festival-games.lang");
+const browserLang = () => {
+  const nav = (navigator.language || "en").toLowerCase();
+  if (!nav.startsWith("zh")) return "en";
+  return /hant|tw|hk|mo/.test(nav) ? "tw" : "zh";
+};
 const clock = (seconds) => `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 
 const shuffle = (items) => [...items].sort(() => Math.random() - .5);
 
 const state = {
-  lang: savedLang === "en" ? "en" : "zh",
+  lang: ["zh", "tw", "en"].includes(savedLang) ? savedLang : browserLang(),
   game: GAMES.some(g => g.id === location.hash.slice(1)) ? location.hash.slice(1) : "moon",
   moon: { deck: shuffle(MOON_PROMPTS.map((_, i) => i)), pos: 0, shared: 0, time: 60, running: false },
   blessing: { round: 0, step: 0, score: 0 },
@@ -214,7 +254,7 @@ let toastId = null;
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const tr = (key) => I18N[state.lang][key];
-const local = (value) => value[state.lang];
+const local = (value) => state.lang === "tw" ? toTW(value.zh) : value[state.lang];
 const game = () => GAMES.find(item => item.id === state.game);
 function toast(message) {
   const el = $("#toast");
@@ -225,8 +265,8 @@ function toast(message) {
 }
 
 function renderStaticText() {
-  document.documentElement.lang = state.lang === "zh" ? "zh-CN" : "en";
-  document.title = state.lang === "zh" ? "欢聚 · 节日互动游戏｜slashai.app" : "Gather · Festival Games | slashai.app";
+  document.documentElement.lang = tr("htmlLang");
+  document.title = tr("docTitle");
   $$('[data-i18n]').forEach(el => { el.textContent = tr(el.dataset.i18n); });
   $$('[data-lang]').forEach(button => button.setAttribute("aria-pressed", String(button.dataset.lang === state.lang)));
   $("#theme-button").setAttribute("aria-label", tr("ariaTheme"));
@@ -263,12 +303,12 @@ function moonView() {
     <div class="board-body"><div class="prompt-card animate" key="${state.moon.deck[state.moon.pos]}">
       <span class="prompt-type">${typeLabel}</span><p class="prompt-text">${local(prompt)}</p><p class="prompt-hint">${tr("moonHint")}</p>
     </div></div>`;
-  return shell(body, state.moon.shared, state.lang === "zh" ? "已分享人数" : "PEOPLE SHARED");
+  return shell(body, state.moon.shared, tr("sharedCount"));
 }
 
 function blessingView() {
   const current = BLESSING_ROUNDS[state.blessing.round % BLESSING_ROUNDS.length];
-  const titles = state.lang === "zh" ? ["回望恩典", "说出感谢", "送上祝福"] : ["Remember grace", "Name gratitude", "Offer blessing"];
+  const titles = [tr("step1"), tr("step2"), tr("step3")];
   const body = `<div class="board-body"><div class="blessing-steps">
     ${current.map((prompt, i) => `<article class="blessing-step ${i === state.blessing.step ? "active" : ""} ${i < state.blessing.step ? "done" : ""}">
       <span class="step-no">0${i + 1}</span><h3>${titles[i]}</h3><p>${local(prompt)}</p>
@@ -278,7 +318,7 @@ function blessingView() {
       <div class="score-control"><button type="button" data-action="score-down" aria-label="-1">−</button><strong>${state.blessing.score}</strong><button type="button" data-action="score-up" aria-label="+1">+</button></div>
       <button class="primary-button" type="button" data-action="blessing-next">${state.blessing.step < 2 ? tr("nextStep") : tr("nextRound")}<svg viewBox="0 0 20 20"><path d="M4 10h11M11 6l4 4-4 4"/></svg></button>
     </div>`;
-  return shell(body, `${String(state.blessing.round + 1).padStart(2,"0")}`, state.lang === "zh" ? "接力回合" : "ROUND");
+  return shell(body, `${String(state.blessing.round + 1).padStart(2,"0")}`, tr("roundLabel"));
 }
 
 function quizView() {
@@ -404,7 +444,8 @@ function showHow() {
   const item = game();
   $("#dialog-kicker").textContent = local(item.festival);
   $("#dialog-title").textContent = local(item.name);
-  $("#dialog-steps").innerHTML = item.steps[state.lang].map(step => `<li>${step}</li>`).join("");
+  const steps = state.lang === "tw" ? item.steps.zh.map(toTW) : item.steps[state.lang];
+  $("#dialog-steps").innerHTML = steps.map(step => `<li>${step}</li>`).join("");
   $("#dialog-note").textContent = tr("hostNote");
   const dialog = $("#how-dialog");
   dialog.showModal();
@@ -421,7 +462,7 @@ async function toggleFullscreen() {
       toast(tr("fullOff"));
     }
   } catch (_) {
-    toast(state.lang === "zh" ? "浏览器未允许全屏，请使用浏览器菜单。" : "Fullscreen was blocked; use your browser menu instead.");
+    toast(tr("fullBlocked"));
   }
 }
 
