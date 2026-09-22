@@ -218,11 +218,16 @@ h1 { max-width: 11em; margin: 0; font: 500 clamp(3rem, 6.3vw, 6rem)/1 Georgia, "
 .quiz-feedback strong { color: var(--accent-ink); }
 
 .bingo-grid { width: min(100%, 56rem); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .6rem; }
-.bingo-cell { position: relative; min-height: 8rem; border: 1px solid var(--st-line-strong); border-radius: .8rem; padding: .9rem; background: var(--st-panel); color: var(--st-ink); cursor: pointer; font-size: clamp(.85rem, 1.5vw, 1.05rem); line-height: 1.45; transition: transform .16s, border-color .16s, background .16s; }
+.bingo-cell { position: relative; min-height: 8rem; display: grid; grid-template-rows: 1fr auto; gap: .45rem; align-content: start; border: 1px solid var(--st-line-strong); border-radius: .8rem; padding: .9rem; background: var(--st-panel); color: var(--st-ink); cursor: pointer; font-size: clamp(.85rem, 1.5vw, 1.05rem); line-height: 1.45; transition: transform .16s, border-color .16s, background .16s; }
 .bingo-cell:hover { transform: translateY(-2px); border-color: var(--game-accent); }
 .bingo-cell.marked { border-color: color-mix(in srgb, var(--game-accent) 70%, transparent); background: color-mix(in srgb, var(--game-accent) 18%, var(--st-panel)); color: var(--st-ink-bright); }
 .bingo-cell.marked::after { content: "✓"; position: absolute; top: .35rem; right: .5rem; color: var(--accent-ink); font-weight: 800; }
 .bingo-cell.winner { animation: winnerPulse 1.2s ease-in-out infinite; }
+.bingo-mark { display: block; width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; line-height: inherit; text-align: left; cursor: inherit; }
+.bingo-name { display: none; width: 100%; padding: .3rem 0 0; border: 0; border-top: 1px solid color-mix(in srgb, var(--game-accent) 45%, transparent); background: none; color: var(--st-ink-bright); font: inherit; font-size: .88em; cursor: text; }
+.bingo-name::placeholder { color: var(--st-soft); }
+.bingo-name:focus { outline: none; border-top-color: var(--game-accent); }
+.bingo-cell.marked .bingo-name { display: block; }
 .host-tips { display: grid; grid-template-columns: .8fr 1.2fr; gap: clamp(2rem, 6vw, 6rem); padding: clamp(5rem, 9vw, 8rem) 0; border-bottom: 1px solid var(--line); }
 .section-index { margin: 0 0 1rem; color: var(--ink-soft); font: 750 .72rem/1.4 ui-monospace, monospace; letter-spacing: .11em; }
 .host-tips h2 { max-width: 9em; margin: 0; font: 500 clamp(2.2rem, 4.5vw, 4.3rem)/1.05 Georgia, "Songti SC", serif; letter-spacing: -.045em; }

@@ -8,7 +8,7 @@ CHROME="${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
 PORT=4179
 trap 'rm -f _selftest.html; kill $SRV 2>/dev/null' EXIT
 
-sed 's#<script src="app.js"></script>#<script>try { localStorage.clear(); } catch (e) {}</script><script src="app.js"></script><script src="selftest.js"></script>#' \
+sed 's#<script src="app.js?v=dev"></script>#<script>try { localStorage.clear(); } catch (e) {}</script><script src="app.js"></script><script src="selftest.js"></script>#' \
   index.html > _selftest.html
 
 python3 -m http.server "$PORT" >/dev/null 2>&1 &

@@ -22,6 +22,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Pages caches every asset for 10 minutes, so a fresh index.html can be
+      # paired with a stale app.js -- which is how a new language button ends
+      # up wired to a script that has never heard of it. Stamp the commit onto
+      # the asset URLs so a deploy can only ever serve one generation.
+      - name: Version the asset URLs
+        run: sed -i "s/?v=dev/?v=${GITHUB_SHA::8}/g" index.html
       - uses: actions/configure-pages@v5
         with:
           enablement: true

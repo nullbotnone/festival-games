@@ -45,7 +45,7 @@ const I18N = {
     copied: "游戏已切换", ariaTheme: "切换明暗主题", hostNote: "主持提醒：掌握整体节奏，也给每一位分享者完整表达的时间。",
     skip: "跳到游戏", htmlLang: "zh-CN", docTitle: "欢聚 · 节日互动游戏｜slashai.app",
     sharedCount: "已分享人数", roundLabel: "接力回合", fullBlocked: "浏览器未允许全屏，请使用浏览器菜单。",
-    step1: "回望恩典", step2: "说出感谢", step3: "送上祝福"
+    step1: "回望恩典", step2: "说出感谢", step3: "送上祝福", namePlaceholder: "写下朋友的名字"
   },
   en: {
     collection: "Festival games", ready: "Ready to play", eyebrow: "Interactive games for church festival gatherings",
@@ -67,7 +67,7 @@ const I18N = {
     copied: "Game changed", ariaTheme: "Toggle light and dark theme", hostNote: "Host note: keep the overall pace while giving each speaker time to finish.",
     skip: "Skip to the game", htmlLang: "en", docTitle: "Gather · Festival Games | slashai.app",
     sharedCount: "PEOPLE SHARED", roundLabel: "ROUND", fullBlocked: "Fullscreen was blocked; use your browser menu instead.",
-    step1: "Remember grace", step2: "Name gratitude", step3: "Offer blessing"
+    step1: "Remember grace", step2: "Name gratitude", step3: "Offer blessing", namePlaceholder: "Write the friend's name"
   }
 };
 
@@ -238,6 +238,7 @@ const browserLang = () => {
 const clock = (seconds) => `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 
 const shuffle = (items) => [...items].sort(() => Math.random() - .5);
+const escapeAttr = (text) => text.replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]);
 
 const state = {
   lang: ["zh", "tw", "en"].includes(savedLang) ? savedLang : browserLang(),
@@ -245,7 +246,7 @@ const state = {
   moon: { deck: shuffle(MOON_PROMPTS.map((_, i) => i)), pos: 0, shared: 0, time: 60, running: false },
   blessing: { round: 0, step: 0, score: 0 },
   quiz: { index: 0, score: 0, selected: null },
-  bingo: { deck: [], prompts: [], marked: new Set(), winners: new Set() }
+  bingo: { deck: [], prompts: [], marked: new Map(), winners: new Set() }
 };
 
 let timerId = null;
@@ -360,7 +361,10 @@ function calculateWinners(marked) {
 function bingoView() {
   if (!state.bingo.prompts.length) dealBingo();
   const body = `<div class="board-body"><div class="bingo-grid">${state.bingo.prompts.map((prompt, i) => `
-    <button class="bingo-cell ${state.bingo.marked.has(i) ? "marked" : ""} ${state.bingo.winners.has(i) ? "winner" : ""}" type="button" data-cell="${i}" aria-pressed="${state.bingo.marked.has(i)}">${local(prompt)}</button>`).join("")}</div></div>
+    <div class="bingo-cell ${state.bingo.marked.has(i) ? "marked" : ""} ${state.bingo.winners.has(i) ? "winner" : ""}">
+      <button class="bingo-mark" type="button" data-cell="${i}" aria-pressed="${state.bingo.marked.has(i)}">${local(prompt)}</button>
+      <input class="bingo-name" data-name="${i}" value="${escapeAttr(state.bingo.marked.get(i) || "")}" placeholder="${tr("namePlaceholder")}" aria-label="${tr("namePlaceholder")}" />
+    </div>`).join("")}</div></div>
     <div class="board-actions"><button class="secondary-button" type="button" data-action="new-board"><svg viewBox="0 0 20 20"><path d="M15 7V3m0 0h-4M15 3l-3 3a6 6 0 1 0 1.3 6.5"/></svg>${tr("newBoard")}</button></div>`;
   return shell(body, `${state.bingo.marked.size}/16`, tr("marked"));
 }
@@ -502,10 +506,12 @@ function handleGameAction(target) {
   const cell = target.closest("[data-cell]");
   if (cell) {
     const index = Number(cell.dataset.cell);
-    if (state.bingo.marked.has(index)) state.bingo.marked.delete(index); else state.bingo.marked.add(index);
+    if (state.bingo.marked.has(index)) state.bingo.marked.delete(index); else state.bingo.marked.set(index, "");
     const hadWinner = state.bingo.winners.size > 0;
     state.bingo.winners = calculateWinners(state.bingo.marked);
     renderGame();
+    /* the host marks the square and types the name in one move */
+    $(`[data-name="${index}"]`)?.focus();
     if (!hadWinner && state.bingo.winners.size) toast(tr("bingo"));
   }
 }
@@ -552,6 +558,10 @@ $("#game-nav").addEventListener("click", event => {
   if (button) selectGame(button.dataset.game, true);
 });
 $("#game-view").addEventListener("click", event => handleGameAction(event.target));
+$("#game-view").addEventListener("input", event => {
+  const field = event.target.closest("[data-name]");
+  if (field) state.bingo.marked.set(Number(field.dataset.name), field.value);
+});
 $("#how-button").addEventListener("click", showHow);
 $("#fullscreen-button").addEventListener("click", toggleFullscreen);
 $("#how-dialog").addEventListener("close", () => document.body.classList.remove("dialog-open"));
