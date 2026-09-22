@@ -175,7 +175,19 @@ const BINGO_PROMPTS = [
   {zh:"今年学会了一项新技能",en:"Learned a new skill this year"}, {zh:"愿意分享一件感恩的事",en:"Will share one thing they are grateful for"},
   {zh:"和你来自不同的省或国家",en:"Comes from a different province or country"}, {zh:"有一个正在期待的新开始",en:"Is looking forward to a new beginning"},
   {zh:"曾邀请朋友来家里吃饭",en:"Has invited friends home for a meal"}, {zh:"能背出一句带来盼望的话",en:"Knows a hopeful quote or verse"},
-  {zh:"喜欢甜食胜过咸食",en:"Prefers sweet food to savory"}, {zh:"曾参加过两种文化的新年庆祝",en:"Has celebrated New Year in two cultures"}
+  {zh:"喜欢甜食胜过咸食",en:"Prefers sweet food to savory"}, {zh:"曾参加过两种文化的新年庆祝",en:"Has celebrated New Year in two cultures"},
+  {zh:"会说三种以上语言或方言",en:"Speaks three or more languages or dialects"}, {zh:"今天走路或骑车来的",en:"Walked or biked here today"},
+  {zh:"有两个以上的兄弟姐妹",en:"Has more than two siblings"}, {zh:"养过一只宠物",en:"Has kept a pet"},
+  {zh:"会包饺子",en:"Knows how to fold dumplings"}, {zh:"生日和你在同一个月",en:"Shares your birth month"},
+  {zh:"今年读完了一本书",en:"Finished a book this year"}, {zh:"有一道家传的甜品做法",en:"Has a family recipe for a dessert"},
+  {zh:"曾在海外过春节",en:"Has spent Lunar New Year abroad"}, {zh:"家里还有人也在这间教会",en:"Has family in this church too"},
+  {zh:"最近换了新工作或新学校",en:"Recently started a new job or school"}, {zh:"会下棋或打牌",en:"Plays chess or cards"},
+  {zh:"是六点前起床的人",en:"Is up before six in the morning"}, {zh:"今年寄出过一张手写卡片",en:"Sent a handwritten card this year"},
+  {zh:"有一个很想去却还没去的地方",en:"Has a place they long to visit"}, {zh:"会修东西：家电或自行车",en:"Can fix things — appliances or bikes"},
+  {zh:"喜欢在厨房里招待人",en:"Loves hosting people in the kitchen"}, {zh:"名字里有和自然有关的字",en:"Has a word from nature in their name"},
+  {zh:"今年为某个人祷告过",en:"Prayed for someone this year"}, {zh:"记得第一次来教会的那一天",en:"Remembers their first day at church"},
+  {zh:"会唱一首儿时的歌",en:"Can sing a song from childhood"}, {zh:"今天身上有一处红色",en:"Is wearing something red today"},
+  {zh:"搬过五次以上的家",en:"Has moved house more than five times"}, {zh:"有一个坚持了一年以上的习惯",en:"Has kept one habit for over a year"}
 ];
 
 const storage = {
@@ -191,7 +203,7 @@ const state = {
   moon: { deck: shuffle(MOON_PROMPTS.map((_, i) => i)), pos: 0, shared: 0, time: 60, running: false },
   blessing: { round: 0, step: 0, score: 0 },
   quiz: { index: 0, score: 0, selected: null },
-  bingo: { prompts: [], marked: new Set(), winners: new Set() }
+  bingo: { deck: [], prompts: [], marked: new Set(), winners: new Set() }
 };
 
 let timerId = null;
@@ -281,6 +293,20 @@ function quizView() {
   return shell(body, `${state.quiz.score}/${QUIZ.length}`, tr("score"));
 }
 
+function dealBingo() {
+  const card = state.bingo.deck.splice(0, 16);
+  if (card.length < 16) {
+    // pool exhausted: refill, keeping the card just played off the next one too
+    const unused = BINGO_PROMPTS.filter(prompt => !card.includes(prompt) && !state.bingo.prompts.includes(prompt));
+    const rest = BINGO_PROMPTS.filter(prompt => !card.includes(prompt));
+    state.bingo.deck = shuffle(unused.length >= 16 ? unused : rest);
+    card.push(...state.bingo.deck.splice(0, 16 - card.length));
+  }
+  state.bingo.prompts = card;
+  state.bingo.marked.clear();
+  state.bingo.winners.clear();
+}
+
 function calculateWinners(marked) {
   const lines = [];
   for (let r = 0; r < 4; r++) lines.push([0,1,2,3].map(c => r * 4 + c));
@@ -290,7 +316,7 @@ function calculateWinners(marked) {
 }
 
 function bingoView() {
-  if (!state.bingo.prompts.length) state.bingo.prompts = shuffle(BINGO_PROMPTS).slice(0, 16);
+  if (!state.bingo.prompts.length) dealBingo();
   const body = `<div class="board-body"><div class="bingo-grid">${state.bingo.prompts.map((prompt, i) => `
     <button class="bingo-cell ${state.bingo.marked.has(i) ? "marked" : ""} ${state.bingo.winners.has(i) ? "winner" : ""}" type="button" data-cell="${i}" aria-pressed="${state.bingo.marked.has(i)}">${local(prompt)}</button>`).join("")}</div></div>
     <div class="board-actions"><button class="secondary-button" type="button" data-action="new-board"><svg viewBox="0 0 20 20"><path d="M15 7V3m0 0h-4M15 3l-3 3a6 6 0 1 0 1.3 6.5"/></svg>${tr("newBoard")}</button></div>`;
@@ -408,9 +434,7 @@ function handleGameAction(target) {
     renderGame();
   }
   if (action === "new-board") {
-    state.bingo.prompts = shuffle(BINGO_PROMPTS).slice(0, 16);
-    state.bingo.marked.clear();
-    state.bingo.winners.clear();
+    dealBingo();
     renderGame();
   }
 
@@ -461,9 +485,7 @@ function registerWebMCP() {
         renderGame();
       }
       if (state.game === "bingo") {
-        state.bingo.prompts = shuffle(BINGO_PROMPTS).slice(0, 16);
-        state.bingo.marked.clear();
-        state.bingo.winners.clear();
+        dealBingo();
         renderGame();
       }
       return { gameId: state.game, advanced: true };
