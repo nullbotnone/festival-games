@@ -242,7 +242,7 @@ function renderNav() {
 
 function shell(inner, statusValue, statusLabel) {
   const item = game();
-  return `<article class="game-board" style="--game-accent:${item.accent}">
+  return `<article class="game-board" data-game="${item.id}" style="--game-accent:${item.accent}">
     <header class="board-head">
       <div><p class="board-kicker">${local(item.festival)} · ${local(item.short)}</p><h2>${local(item.name)}</h2><p class="board-description">${local(item.description)}</p></div>
       <div class="board-status"><strong>${statusValue}</strong><small>${statusLabel}</small></div>

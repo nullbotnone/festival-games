@@ -123,6 +123,7 @@ h1 { max-width: 11em; margin: 0; font: 500 clamp(3rem, 6.3vw, 6rem)/1 Georgia, "
   --st-line: #dccca429;
   --st-line-strong: #d2bb8454;
   --accent-ink: var(--game-accent);
+  --motif-opacity: .13;
   --st-ok: #85a99a; --st-ok-bg: #243b354f; --st-ok-ink: #e8fff4; --st-ok-on: #08120e;
   --st-no: #c56b60; --st-no-bg: #4c24244d; --st-no-ink: #ffd9d2; --st-no-on: #1b0807;
   min-width: 0; display: flex; flex-direction: column; background: var(--st-bg); color: var(--st-ink);
@@ -141,6 +142,7 @@ h1 { max-width: 11em; margin: 0; font: 500 clamp(3rem, 6.3vw, 6rem)/1 Georgia, "
   --st-line: #8b754940;
   --st-line-strong: #9b7d3f8c;
   --accent-ink: color-mix(in srgb, var(--game-accent) 55%, #2a1d02);
+  --motif-opacity: .2;
   --st-ok: #3f6f5f; --st-ok-bg: #3f6f5f1f; --st-ok-ink: #14402f; --st-ok-on: #f4fffa;
   --st-no: #a6463a; --st-no-bg: #a6463a1c; --st-no-ink: #6d1f16; --st-no-on: #fff3f0;
 }
@@ -154,6 +156,16 @@ h1 { max-width: 11em; margin: 0; font: 500 clamp(3rem, 6.3vw, 6rem)/1 Georgia, "
 .game-view { flex: 1; min-height: 36rem; display: grid; padding: clamp(1.35rem, 3vw, 2.5rem); background-image: linear-gradient(var(--st-grid) 1px, transparent 1px), linear-gradient(90deg, var(--st-grid) 1px, transparent 1px); background-size: 3.3rem 3.3rem; }
 
 .game-board { --game-accent: #e2c57b; position: relative; overflow: hidden; min-height: 100%; display: flex; flex-direction: column; border: 1px solid var(--st-line); border-radius: 1.3rem; background: radial-gradient(circle at 83% 12%, color-mix(in srgb, var(--game-accent) 12%, transparent), transparent 31%), var(--st-board); }
+@supports (mask-image: url("")) or (-webkit-mask-image: url("")) {
+  /* festival motif watermark, tinted with the game accent */
+  .game-board::after { content: ""; position: absolute; z-index: 0; inset: 0; pointer-events: none; background: var(--game-accent); opacity: var(--motif-opacity); -webkit-mask-image: var(--motif); mask-image: var(--motif); -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: right .6rem top .6rem; mask-position: right .6rem top .6rem; -webkit-mask-size: min(25rem, 44%); mask-size: min(25rem, 44%); }
+  .game-board > * { position: relative; z-index: 1; }
+  .game-board[data-game="moon"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round'%3E %3Cg opacity='.45'%3E%3Ccircle cx='158' cy='66' r='50' fill='%23000' stroke='none'/%3E%3C/g%3E %3Ccircle cx='158' cy='66' r='50'/%3E %3Ccircle cx='158' cy='66' r='34' stroke-dasharray='5 11' opacity='.7'/%3E %3Cg opacity='.4'%3E%3Ccircle cx='56' cy='150' r='19' fill='%23000' stroke='none'/%3E%3Ccircle cx='84' cy='139' r='27' fill='%23000' stroke='none'/%3E%3Ccircle cx='113' cy='150' r='18' fill='%23000' stroke='none'/%3E%3Crect x='50' y='150' width='70' height='19' rx='9.5' fill='%23000' stroke='none'/%3E%3C/g%3E %3Cg opacity='.3'%3E%3Ccircle cx='140' cy='196' r='15' fill='%23000' stroke='none'/%3E%3Ccircle cx='163' cy='188' r='21' fill='%23000' stroke='none'/%3E%3Ccircle cx='186' cy='196' r='14' fill='%23000' stroke='none'/%3E%3Crect x='135' y='196' width='56' height='15' rx='7.5' fill='%23000' stroke='none'/%3E%3C/g%3E %3Cg opacity='.8'%3E%3Cpath d='M44 52v10M39 57h10M78 26v8M74 30h8M30 104v8M26 108h8'/%3E%3C/g%3E %3C/svg%3E"); }
+  .game-board[data-game="blessing"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round'%3E %3Cpath d='M120 16v20'/%3E %3Crect x='70' y='54' width='100' height='100' rx='10' transform='rotate(45 120 104)'/%3E %3Crect x='88' y='72' width='64' height='64' rx='8' transform='rotate(45 120 104)' stroke-dasharray='7 9' opacity='.7'/%3E %3Ccircle cx='120' cy='104' r='15'/%3E %3Cpath d='M114 104h12M120 98v12' opacity='.8'/%3E %3Ccircle cx='120' cy='176' r='7'/%3E %3Cpath d='M120 183v40M106 186v33M134 186v33' opacity='.85'/%3E %3C/svg%3E"); }
+  .game-board[data-game="lantern"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round'%3E%3Cg opacity='.5'%3E%3Cpath d='M14 46h212'/%3E%3C/g%3E%3Cpath d='M64 46v43'/%3E%3Crect x='51' y='89' width='26' height='8' rx='2.5'/%3E%3Cellipse cx='64' cy='128' rx='26' ry='30'/%3E%3Cellipse cx='64' cy='128' rx='11.7' ry='30' opacity='.6'/%3E%3Crect x='54' y='158' width='21' height='8' rx='2.5'/%3E%3Cpath d='M64 167v26' opacity='.8'/%3E%3Cpath d='M136 46v-6'/%3E%3Crect x='120' y='40' width='32' height='8' rx='2.5'/%3E%3Cellipse cx='136' cy='86' rx='32' ry='37'/%3E%3Cellipse cx='136' cy='86' rx='14.4' ry='37' opacity='.6'/%3E%3Crect x='123' y='123' width='26' height='8' rx='2.5'/%3E%3Cpath d='M136 132v32' opacity='.8'/%3E%3Cpath d='M200 46v69'/%3E%3Crect x='189' y='115' width='22' height='8' rx='2.5'/%3E%3Cellipse cx='200' cy='150' rx='22' ry='26'/%3E%3Cellipse cx='200' cy='150' rx='9.9' ry='26' opacity='.6'/%3E%3Crect x='191' y='176' width='18' height='8' rx='2.5'/%3E%3Cpath d='M200 185v22' opacity='.8'/%3E%3C/svg%3E"); }
+  .game-board[data-game="bingo"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round'%3E%3Ccircle cx='120' cy='120' r='96'/%3E%3Ccircle cx='120' cy='120' r='30'/%3E%3Ccircle cx='120' cy='120' r='16' opacity='.6'/%3E%3Ccircle cx='182.0' cy='120.0' r='15'/%3E%3Ccircle cx='151.0' cy='173.7' r='15'/%3E%3Ccircle cx='89.0' cy='173.7' r='15'/%3E%3Ccircle cx='58.0' cy='120.0' r='15'/%3E%3Ccircle cx='89.0' cy='66.3' r='15'/%3E%3Ccircle cx='151.0' cy='66.3' r='15'/%3E%3Cpath d='M183.2 160.5L198.8 169.5M186.7 154.5L202.3 163.5' opacity='.7'/%3E%3Cpath d='M116.5 195.0L116.5 213.0M123.5 195.0L123.5 213.0' opacity='.7'/%3E%3Cpath d='M53.3 154.5L37.7 163.5M56.8 160.5L41.2 169.5' opacity='.7'/%3E%3Cpath d='M56.8 79.5L41.2 70.5M53.3 85.5L37.7 76.5' opacity='.7'/%3E%3Cpath d='M123.5 45.0L123.5 27.0M116.5 45.0L116.5 27.0' opacity='.7'/%3E%3Cpath d='M186.7 85.5L202.3 76.5M183.2 79.5L198.8 70.5' opacity='.7'/%3E%3C/svg%3E"); }
+}
+
 .board-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; padding: clamp(1.4rem, 3vw, 2.2rem) clamp(1.4rem, 3vw, 2.4rem) 1.1rem; }
 .board-kicker { display: flex; align-items: center; gap: .65rem; margin: 0 0 .7rem; color: var(--accent-ink); font: 760 .7rem/1.4 ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; }
 .board-kicker::before { content: ""; width: 1.8rem; height: 1px; background: currentColor; }
@@ -318,3 +330,4 @@ footer p { margin: 0; text-align: center; }
 :fullscreen .bingo-grid { width: min(100%, 78rem); }
 :fullscreen .bingo-cell { min-height: 9rem; font-size: clamp(1rem, 1.5vw, 1.4rem); }
 :fullscreen .board-description { font-size: 1.05rem; }
+:fullscreen .game-board::after { -webkit-mask-size: min(34rem, 34%); mask-size: min(34rem, 34%); }
