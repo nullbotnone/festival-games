@@ -11,6 +11,7 @@ const I18N = {
     draw: "换一张", startTimer: "开始计时", pauseTimer: "暂停", resetTimer: "重置 60 秒", seconds: "秒",
     faith: "信仰分享", warmup: "轻松破冰", story: "故事与记忆", gratitude: "感谢与盼望",
     moonHint: "每人最多分享 60 秒", passes: "已分享", people: "人",
+    deckReset: "所有问题都抽过了 · 重新洗牌",
     nextStep: "下一步", nextRound: "下一棒", round: "第", roundUnit: "棒", teamScore: "团队暖心值",
     chooseAnswer: "请选择答案", nextQuestion: "下一题", restartQuiz: "再玩一轮", correct: "答对了！", notQuite: "差一点。",
     score: "得分", question: "题", answer: "答案", newBoard: "换一张卡", bingo: "连线成功！请邀请其中一位朋友分享故事。", marked: "已找到",
@@ -29,6 +30,7 @@ const I18N = {
     draw: "Draw another", startTimer: "Start timer", pauseTimer: "Pause", resetTimer: "Reset 60 sec", seconds: "sec",
     faith: "Faith reflection", warmup: "Easy opener", story: "Story & memory", gratitude: "Gratitude & hope",
     moonHint: "Up to 60 seconds for each person", passes: "Shared", people: "people",
+    deckReset: "Every prompt has been drawn · reshuffling",
     nextStep: "Next step", nextRound: "Pass it on", round: "Round", roundUnit: "", teamScore: "Warmth points",
     chooseAnswer: "Choose an answer", nextQuestion: "Next question", restartQuiz: "Play again", correct: "That's right!", notQuite: "Not quite.",
     score: "Score", question: "Question", answer: "Answer", newBoard: "New card", bingo: "Line complete! Invite one person in the line to share their story.", marked: "Found",
@@ -181,10 +183,12 @@ const storage = {
   set(key, value) { try { localStorage.setItem(key, value); } catch (_) { /* private browsing */ } }
 };
 const savedLang = storage.get("festival-games.lang");
+const shuffle = (items) => [...items].sort(() => Math.random() - .5);
+
 const state = {
   lang: savedLang === "en" ? "en" : "zh",
   game: GAMES.some(g => g.id === location.hash.slice(1)) ? location.hash.slice(1) : "moon",
-  moon: { index: Math.floor(Math.random() * MOON_PROMPTS.length), shared: 0, time: 60, running: false },
+  moon: { deck: shuffle(MOON_PROMPTS.map((_, i) => i)), pos: 0, shared: 0, time: 60, running: false },
   blessing: { round: 0, step: 0, score: 0 },
   quiz: { index: 0, score: 0, selected: null },
   bingo: { prompts: [], marked: new Set(), winners: new Set() }
@@ -198,8 +202,6 @@ const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const tr = (key) => I18N[state.lang][key];
 const local = (value) => value[state.lang];
 const game = () => GAMES.find(item => item.id === state.game);
-const shuffle = (items) => [...items].sort(() => Math.random() - .5);
-
 function toast(message) {
   const el = $("#toast");
   clearTimeout(toastId);
@@ -237,9 +239,9 @@ function shell(inner, statusValue, statusLabel) {
 }
 
 function moonView() {
-  const prompt = MOON_PROMPTS[state.moon.index];
+  const prompt = MOON_PROMPTS[state.moon.deck[state.moon.pos]];
   const typeLabel = tr(prompt.type);
-  const body = `<div class="board-body"><div class="prompt-card animate" key="${state.moon.index}">
+  const body = `<div class="board-body"><div class="prompt-card animate" key="${state.moon.deck[state.moon.pos]}">
       <span class="prompt-type">${typeLabel}</span><p class="prompt-text">${local(prompt)}</p><p class="prompt-hint">${tr("moonHint")}</p>
     </div></div>
     <div class="board-actions">
@@ -351,9 +353,13 @@ function toggleTimer() {
 
 function drawMoon() {
   stopTimer();
-  let next = state.moon.index;
-  while (next === state.moon.index) next = Math.floor(Math.random() * MOON_PROMPTS.length);
-  state.moon.index = next;
+  state.moon.pos += 1;
+  if (state.moon.pos >= state.moon.deck.length) {
+    const last = state.moon.deck[state.moon.deck.length - 1];
+    do { state.moon.deck = shuffle(state.moon.deck); } while (state.moon.deck[0] === last);
+    state.moon.pos = 0;
+    toast(tr("deckReset"));
+  }
   state.moon.time = 60;
   renderGame();
 }
