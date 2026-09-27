@@ -225,11 +225,13 @@ const BINGO_PROMPTS = [
   {zh:"搬过五次以上的家",en:"Has moved house more than five times"}, {zh:"有一个坚持了一年以上的习惯",en:"Has kept one habit for over a year"}
 ];
 
+/* Same keys and JSON values as the other slashai.app pages, so language and
+   theme carry across the site. */
 const storage = {
-  get(key) { try { return localStorage.getItem(key); } catch (_) { return null; } },
-  set(key, value) { try { localStorage.setItem(key, value); } catch (_) { /* private browsing */ } }
+  get(key) { try { return JSON.parse(localStorage.getItem("slashai." + key)); } catch (_) { return null; } },
+  set(key, value) { try { localStorage.setItem("slashai." + key, JSON.stringify(value)); } catch (_) { /* private browsing */ } }
 };
-const savedLang = storage.get("festival-games.lang");
+const savedLang = storage.get("lang");
 const browserLang = () => {
   const nav = (navigator.language || "en").toLowerCase();
   if (!nav.startsWith("zh")) return "en";
@@ -571,16 +573,17 @@ $("#how-dialog").addEventListener("click", event => {
 });
 $$('[data-lang]').forEach(button => button.addEventListener("click", () => {
   state.lang = button.dataset.lang;
-  storage.set("festival-games.lang", state.lang);
+  storage.set("lang", state.lang);
   render();
 }));
 $("#theme-button").addEventListener("click", () => {
   const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
   document.documentElement.dataset.theme = next;
-  storage.set("festival-games.theme", next);
+  storage.set("theme", next);
 });
 window.addEventListener("hashchange", () => selectGame(location.hash.slice(1)));
 
-document.documentElement.dataset.theme = storage.get("festival-games.theme") || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+const savedTheme = storage.get("theme");
+document.documentElement.dataset.theme = savedTheme === "light" || savedTheme === "dark" ? savedTheme : (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
 render();
 registerWebMCP();
